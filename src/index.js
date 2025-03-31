@@ -4,14 +4,27 @@ export default {
     const target = url.searchParams.get("target")
 
     if (!target) {
-      return new Response("Missing ?target= URL param", { status: 400 })
+      return new Response("Missing ?target= param", { status: 400 })
     }
 
-    const res = await fetch(target)
-    const body = await res.text()
+    // Clone original request, but replace the URL
+    const proxyRequest = new Request(target, {
+      method: request.method,
+      headers: request.headers,
+      body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : null,
+      redirect: 'follow'
+    })
 
-    return new Response(body, {
-      headers: { 'Content-Type': 'text/plain' }
+    const response = await fetch(proxyRequest)
+
+    // Return the response as-is with status and headers
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: {
+        ...Object.fromEntries(response.headers),
+        'Access-Control-Allow-Origin': '*', // CORS fix
+      }
     })
   }
 }
