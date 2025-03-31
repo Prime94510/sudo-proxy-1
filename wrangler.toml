@@ -1,4 +1,5 @@
 name = "simple-proxy-1"
-main = "./.output/server/index.mjs"
+main = "src/index.js"
+type = "module"
+compatibility_date = "2025-03-31"
 workers_dev = true
-compatibility_date = "2022-09-10"
